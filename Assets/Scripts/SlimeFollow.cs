@@ -2,35 +2,55 @@ using UnityEngine;
 
 public class SlimeFollow : MonoBehaviour
 {
-    public float followMovement = 5f;
+    [SerializeField] private float followSpeed = 5f;       // Velocidad de movimiento
+    [SerializeField] private float stopDistance = 1.5f;    // Distancia mínima al jugador
     private Transform player;
+    private bool playerInRange = false;
     public bool isFollowing = false;
-    void Start()
-    {
 
-    }
-
-    void OnTriggerStay2D(Collider2D x)
+    private void Update()
     {
-        // Detecta si el jugador está dentro del rango
-        if (x.CompareTag("Player"))
+        // Si el jugador está en rango y presiona E, el slime empieza a seguir
+        if (playerInRange && Input.GetKeyDown(KeyCode.E))
         {
-            // Si presiona E, empieza a seguirlo
-            if (Input.GetKeyDown(KeyCode.E))
+            isFollowing = true;
+        }
+
+        // Si está siguiendo y hay un jugador asignado
+        if (isFollowing && player != null)
+        {
+            // Calculamos la distancia actual
+            float distance = Vector2.Distance(transform.position, player.position);
+
+            // Si la distancia es mayor al rango de parada, seguir moviéndose
+            if (distance > stopDistance)
             {
-                player = x.transform;
-                isFollowing = true;
+                transform.position = Vector2.MoveTowards(
+                    transform.position,
+                    player.position,
+                    followSpeed * Time.deltaTime
+                );
             }
+            // Si está muy cerca, no se mueve (queda quieto)
         }
     }
 
-    void Update()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        // Si está en modo seguimiento, se mueve hacia el jugador
-        if (isFollowing && player != null)
+        // Cuando el jugador entra al rango del trigger
+        if (other.CompareTag("Player"))
         {
-            transform.position = Vector2.MoveTowards(transform.position, player.position, followMovement * Time.deltaTime);
+            player = other.transform;
+            playerInRange = true;
+        }
+    }
 
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        // Cuando el jugador sale del rango del trigger
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
         }
     }
 }

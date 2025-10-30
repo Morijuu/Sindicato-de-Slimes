@@ -1,34 +1,31 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
-    float movement = 5f;
+    public float speed = 5f; // velocidad p�blica para modificar en el inspector
+    private Rigidbody2D rb;  // referencia al Rigidbody2D
+    private Vector2 movementInput;
+
     void Start()
     {
-
+        // Obtener el componente Rigidbody2D del objeto
+        rb = GetComponent<Rigidbody2D>();
     }
-
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.W))
-        {
-            transform.position += movement * Time.deltaTime * Vector3.up;
-        }
+        // Leer la entrada del jugador (WASD o flechas)
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveY = Input.GetAxisRaw("Vertical");
 
-        if (Input.GetKey(KeyCode.S))
-        {
-            transform.position += movement * Time.deltaTime * Vector3.down;
-        }
+        // Crear el vector de movimiento
+        movementInput = new Vector2(moveX, moveY).normalized;
+    }
 
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.position += movement * Time.deltaTime * Vector3.left;
-        }
-
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.position += movement * Time.deltaTime * Vector3.right;
-        }
+    void FixedUpdate()
+    {
+        // Aplicar el movimiento usando el Rigidbody2D (en FixedUpdate para f�sica)
+        rb.linearVelocity = movementInput * speed;
     }
 }
