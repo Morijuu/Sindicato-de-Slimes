@@ -16,12 +16,12 @@ Entre sus mecánicas se encuentra:
 ###### Primera actualización
 
 Lo primero que se implementó al proyecto fueron el sistema de movimiento del personaje principal y la cámara que sigue al jugador. 
- ![Imagen del Concept art de los slimes](Media/Imagenes/ConceptArtSlimes1.png)
+ [Gif del movimiento]
  [Codigo del movimiento]
 
  En segundo lugar hicimos bocetos de fases primerizas de los slimes e implmentamos uno al proyecto. Junto con un codigo que permitia al jugador interactuar cerca de un Slime para que este lo siguiera. 
 
- [Imagenes de los Slimes]
+ ![Imagen del Concept art de los slimes](Media/Imagenes/ConceptArtSlimes1.png)
  [Gif del personaje haciendo que le sigan]
  [Codigo del seguimiento] 
 
