@@ -1,6 +1,6 @@
-#Sindicato de Slimes 
+# Sindicato de Slimes 
 
-###Que es nuestro proyecto?
+### Que es nuestro proyecto?
 
 Sindicato de Slimes es un videojuego 2D en desarrollo el cual consta en atrapar Slimes con distintos atributos para vencer a una serie de Jefes. 
 Pertenece al género "Roguelike", donde el jugador deberá jugar cada vez la misma partida pero con distintas variaciones cada vez.
@@ -11,9 +11,9 @@ Entre sus mecánicas se encuentra:
   - Sistema de aleatorización de estadísticas para que cada partida sea única.
   - 3 Bosses separados en tres pisos distintos, cada uno diferente.
 
-###Actualizaciones
+### Actualizaciones
 
-######Primera actualización
+###### Primera actualización
 
 Lo primero que se implementó al proyecto fueron el sistema de movimiento del personaje principal y la cámara que sigue al jugador. 
  [Gif del personaje moviendose]
@@ -25,6 +25,6 @@ Lo primero que se implementó al proyecto fueron el sistema de movimiento del pe
  [Gif del personaje haciendo que le sigan]
  [Codigo del seguimiento] 
 
- ######Segunda actualización
+ ###### Segunda actualización
 
  
