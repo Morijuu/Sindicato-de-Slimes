@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class SlimeSpawner : MonoBehaviour
 {
-    public SpriteRenderer spawnArea;   // Área visible de spawn
+    public SpriteRenderer spawnArea;   // ï¿½rea visible de spawn
 
     public GameObject slimeNormalPrefab;
     public GameObject slimeRapidoPrefab;
@@ -25,7 +25,7 @@ public class SlimeSpawner : MonoBehaviour
 
     void SpawnOne()
     {
-        // Posición aleatoria dentro del sprite
+        // Posiciï¿½n aleatoria dentro del sprite
         Bounds b = spawnArea.bounds; //convierte el rectangulo de spawn en coordenadas
         float x = Random.Range(b.min.x, b.max.x);
         float y = Random.Range(b.min.y, b.max.y);

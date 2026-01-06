@@ -11,7 +11,7 @@ public enum TipoSlime
 public class SlimeStats : MonoBehaviour
 {
     public TipoSlime tipoSeleccionado;
-    public SlimeType tipo; // esta se llena automáticamente
+    public SlimeType tipo; // esta se llena automï¿½ticamente
 
     void Start()
     {

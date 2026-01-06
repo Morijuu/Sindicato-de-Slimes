@@ -2,26 +2,29 @@ using UnityEngine;
 
 public class CameraFollowRoom : MonoBehaviour
 {
-    public float transitionSpeed = 5f; 
+    public float transitionSpeed = 6f;
     private Vector3 targetPosition;
-    
-    void Start()
+
+    private void Start()
     {
         targetPosition = transform.position;
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         transform.position = Vector3.Lerp(
-            transform.position, 
-            targetPosition, 
+            transform.position,
+            targetPosition,
             Time.deltaTime * transitionSpeed
         );
     }
 
     public void MoveToNewRoom(Vector3 newPosition)
     {
-        newPosition.z = transform.position.z; 
-        targetPosition = newPosition;
+        targetPosition = new Vector3(
+            newPosition.x,
+            newPosition.y,
+            transform.position.z
+        );
     }
 }

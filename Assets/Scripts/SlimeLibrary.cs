@@ -18,7 +18,7 @@ public class SlimeType
 public static class slime
 {
     public static SlimeType normal = new SlimeType("Normal", 5f, 1f, 10);
-    public static SlimeType rapido = new SlimeType("Rápido", 8f, 0.5f, 8);
+    public static SlimeType rapido = new SlimeType("Rï¿½pido", 8f, 0.5f, 8);
     public static SlimeType pesado = new SlimeType("Pesado", 3f, 3f, 20);
     public static SlimeType tanque = new SlimeType("Tanque", 2f, 5f, 40);
 }
