@@ -9,10 +9,15 @@ public class SlimeSpawner : MonoBehaviour
     public GameObject slimePesadoPrefab;
     public GameObject slimeTanquePrefab;
 
+    public Transform fearCenter; // arrastra aquí tu Empty del “radio”
+    public float fearRadius = 3f;
+
     public int pNormal = 50;
     public int pRapido = 20;
     public int pPesado = 20;
     public int pTanque = 10;
+
+
 
     void Start()
     {
@@ -23,15 +28,27 @@ public class SlimeSpawner : MonoBehaviour
         }
     }
 
+    int GetMaxChance()
+    {
+        int max = pNormal;
+        if (pRapido > max) max = pRapido;
+        if (pPesado > max) max = pPesado;
+        if (pTanque > max) max = pTanque;
+        return max;
+    }
+
+
     void SpawnOne()
     {
-        // Posici�n aleatoria dentro del sprite
-        Bounds b = spawnArea.bounds; //convierte el rectangulo de spawn en coordenadas
+        // 1) Calcular posición
+        Bounds b = spawnArea.bounds;
+
         float x = Random.Range(b.min.x, b.max.x);
         float y = Random.Range(b.min.y, b.max.y);
+
         Vector3 pos = new Vector3(x, y, 0f);
 
-        // Elegir tipo por probabilidad
+        // 2) Elegir prefab por probabilidad
         int r = Random.Range(0, 100);
         GameObject prefab;
 
@@ -44,7 +61,25 @@ public class SlimeSpawner : MonoBehaviour
         else
             prefab = slimeTanquePrefab;
 
-        // Crear slime
-        Instantiate(prefab, pos, Quaternion.identity);
+        GameObject slime = Instantiate(prefab, pos, Quaternion.identity);
+
+        SlimeWanderFlee ai = slime.GetComponent<SlimeWanderFlee>();
+        if (ai != null)
+        {
+            ai.spawnArea = spawnArea;
+            ai.spawnChance = GetChanceForPrefab(prefab);
+            ai.maxChance = GetMaxChance();
+            ai.fearCenter = fearCenter;
+            ai.fearRadius = fearRadius;
+        }
     }
+
+    int GetChanceForPrefab(GameObject prefab)
+    {
+        if (prefab == slimeNormalPrefab) return pNormal;                // Normal
+        if (prefab == slimeRapidoPrefab) return pRapido;                // Rápido
+        if (prefab == slimePesadoPrefab) return pPesado;                // Pesado
+        return pTanque;                                                  // Tanque
+    }
+
 }

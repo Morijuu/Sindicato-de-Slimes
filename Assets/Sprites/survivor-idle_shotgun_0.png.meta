@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 5f54eae7a5095924c98f48a1e141a9ad
+guid: a5d47aa47aaebb749b9b7147a86cec25
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3813027528237649320
-    second: Gemini_Generated_Image_it5xbcit5xbcit5x_0
+      213: 3987934244570577244
+    second: survivor-idle_shotgun_0_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Gemini_Generated_Image_it5xbcit5xbcit5x_0
+      name: survivor-idle_shotgun_0_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1024
-        height: 1024
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 35
+        y: 15
+        width: 261
+        height: 157
+      alignment: 9
+      pivot: {x: 0.30385613, y: 0.48739815}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 852fb945aa7651bc0800000000000000
-      internalID: -3813027528237649320
+      spriteID: c59be33011df75730800000000000000
+      internalID: 3987934244570577244
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 4bf7e8bbb62c50347b1381ed9dd5c5aa
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Gemini_Generated_Image_it5xbcit5xbcit5x_0: -3813027528237649320
+      survivor-idle_shotgun_0_0: 3987934244570577244
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
