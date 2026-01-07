@@ -3,74 +3,80 @@ using System.Collections.Generic;
 
 public class SlimeFollow : MonoBehaviour
 {
-    public static List<Transform> followers = new List<Transform>(); 
+    // Esta es la lista que BossManager y RoomTransition buscan
+    public static List<GameObject> fila = new List<GameObject>();
+
+    [Header("Estado")]
+    public bool siguiendo = false; // Esta es la variable que daba error
     
-    [SerializeField] private float followSpeed = 5f;
-    [SerializeField] private float stopDistance = 1.5f;
-    [SerializeField] private float trailingDistance = 1.0f;
-    
-    private Transform player;
-    private Transform followTarget;
-    private bool playerInRange = false;
-    public bool isFollowing = false;
-    
-    [SerializeField] private int maxSlimes = 5;
-    
+    [Header("Ajustes")]
+    public float velocidad = 6f;
+    private Transform objetivo;
+    private bool jugadorCerca = false;
+
     void Start()
     {
-        if (followers.Count == 0 && GameObject.FindGameObjectWithTag("Player") != null)
+        // Inicializar la fila con el Player si es el primer slime
+        if (fila.Count == 0)
         {
-            followers.Add(GameObject.FindGameObjectWithTag("Player").transform);
+            GameObject p = GameObject.FindGameObjectWithTag("Player");
+            if (p != null) fila.Add(p);
         }
     }
 
-    private void Update()
+    void Update()
     {
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        // RECLUTAR con la E
+        if (jugadorCerca && Input.GetKeyDown(KeyCode.E) && !siguiendo)
         {
-            if (!isFollowing && followers.Count < maxSlimes + 1)
-            {
-                isFollowing = true;
-                
-                followTarget = followers[followers.Count - 1];
-                
-                followers.Add(this.transform);
-                
-                playerInRange = false;
-            }
+            Reclutar();
         }
 
-        if (isFollowing && followTarget != null)
+        // MOVIMIENTO
+        if (siguiendo && objetivo != null)
         {
-            float requiredDistance = (followTarget == followers[0]) ? stopDistance : trailingDistance;
-            
-            float distance = Vector2.Distance(transform.position, followTarget.position);
+            float dist = Vector2.Distance(transform.position, objetivo.position);
 
-            if (distance > requiredDistance)
+            // TP si el jugador cambia de sala (distancia grande)
+            if (dist > 12f) transform.position = objetivo.position;
+
+            // Seguir al objetivo
+            if (dist > 1.2f)
             {
-                transform.position = Vector2.MoveTowards(
-                    transform.position,
-                    followTarget.position,
-                    followSpeed * Time.deltaTime
-                );
+                transform.position = Vector2.MoveTowards(transform.position, objetivo.position, velocidad * Time.deltaTime);
             }
         }
     }
 
+    void Reclutar()
+    {
+        if (fila.Count > 0)
+        {
+            objetivo = fila[fila.Count - 1].transform;
+            fila.Add(this.gameObject);
+            siguiendo = true;
+
+            // Desactivar movimiento aleatorio si existe
+            if (GetComponent<SlimeWanderFlee>() != null) GetComponent<SlimeWanderFlee>().enabled = false;
+            
+            Debug.Log("Slime reclutado. Siguiendo a: " + objetivo.name);
+        }
+    }
+
+    public void CambiarObjetivo(Transform nuevo) 
+    { 
+        objetivo = nuevo; 
+        siguiendo = true;
+    }
+
+    // Detección del jugador (Asegúrate de tener un CircleCollider2D como Trigger)
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !isFollowing)
-        {
-            player = other.transform;
-            playerInRange = true;
-        }
+        if (other.CompareTag("Player")) jugadorCerca = true;
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
-            playerInRange = false;
-        }
+        if (other.CompareTag("Player")) jugadorCerca = false;
     }
 }

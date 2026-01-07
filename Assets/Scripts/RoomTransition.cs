@@ -15,7 +15,6 @@ public class RoomTransition : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         Room currentRoom = RoomManager.instance.GetCurrentRoom();
-
         Room targetRoom;
         Vector2 spawnPos;
 
@@ -30,21 +29,30 @@ public class RoomTransition : MonoBehaviour
             spawnPos = spawnInRoomA;
         }
 
-        // mover player
+        // 1. MOVER AL JUGADOR
         other.transform.position = spawnPos;
         Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
         if (rb != null) rb.linearVelocity = Vector2.zero;
 
-        // mover slimes seguidores
-        for (int i = 1; i < SlimeFollow.followers.Count; i++)
+        // 2. TELETRANSPORTAR SLIMES (Cambiado 'followers' por 'fila')
+        // Empezamos en 1 porque el 0 es el Jugador
+        for (int i = 1; i < SlimeFollow.fila.Count; i++)
         {
-            Transform slime = SlimeFollow.followers[i];
-            slime.position = spawnPos;
+            GameObject slimeObj = SlimeFollow.fila[i];
+            
+            if (slimeObj != null)
+            {
+                slimeObj.transform.position = spawnPos;
 
-            Rigidbody2D slimeRb = slime.GetComponent<Rigidbody2D>();
-            if (slimeRb != null) slimeRb.linearVelocity = Vector2.zero;
+                Rigidbody2D slimeRb = slimeObj.GetComponent<Rigidbody2D>();
+                if (slimeRb != null) 
+                {
+                    slimeRb.linearVelocity = Vector2.zero;
+                }
+            }
         }
 
+        // 3. CAMBIAR DE SALA Y CÁMARA
         RoomManager.instance.ChangeRoom(targetRoom);
     }
 }

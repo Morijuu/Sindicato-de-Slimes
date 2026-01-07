@@ -3,8 +3,8 @@ using UnityEngine;
 public class SlimeFlee : MonoBehaviour
 {
     public float baseSpeed = 3f;              // Velocidad base media
-    public float fearMultiplier = 1.5f;       // Cuánto influye el miedo
-    public float stdDev = 0.4f;                // Desviación típica (ruido normal)
+    public float fearMultiplier = 1.5f;       // Cuï¿½nto influye el miedo
+    public float stdDev = 0.4f;                // Desviaciï¿½n tï¿½pica (ruido normal)
 
     [HideInInspector] public int spawnChance;  // Porcentaje con el que spawnea este slime
     [HideInInspector] public int maxChance;    // Mayor porcentaje posible (ej. 50)
@@ -21,17 +21,17 @@ public class SlimeFlee : MonoBehaviour
 
         if (maxChance <= 0)
         {
-            Debug.LogError("maxChance inválido, se corrige a 1");
+            Debug.LogError("maxChance invï¿½lido, se corrige a 1");
             maxChance = 1;
         }
 
         if (spawnChance < 0)
         {
-            Debug.LogError("spawnChance inválido, se corrige a 0");
+            Debug.LogError("spawnChance invï¿½lido, se corrige a 0");
             spawnChance = 0;
         }
 
-        float rareFactor = 1f - ((float)spawnChance / maxChance);      // Menos probabilidad = más raro
+        float rareFactor = 1f - ((float)spawnChance / maxChance);      // Menos probabilidad = mï¿½s raro
         float fear = 1f + rareFactor * fearMultiplier;                 // Calcula el miedo
 
         float noise = RandomNormal() * stdDev;                          // Ruido normal (gaussiano)
@@ -42,10 +42,10 @@ public class SlimeFlee : MonoBehaviour
 
     void Update()
     {
-        Vector3 dirAway = transform.position - player.position;        // Dirección opuesta al jugador
-        dirAway = dirAway.normalized;                                   // Normaliza la dirección
+        Vector3 dirAway = transform.position - player.position;        // Direcciï¿½n opuesta al jugador
+        dirAway = dirAway.normalized;                                   // Normaliza la direcciï¿½n
 
-        transform.position += dirAway * speed * Time.deltaTime;        // Mueve el slime alejándose
+        transform.position += dirAway * speed * Time.deltaTime;        // Mueve el slime alejï¿½ndose
     }
 
     float RandomNormal()
@@ -54,6 +54,6 @@ public class SlimeFlee : MonoBehaviour
         float u2 = Random.value;                                        // Valor aleatorio 0..1
 
         return Mathf.Sqrt(-2f * Mathf.Log(u1)) *
-               Mathf.Cos(2f * Mathf.PI * u2);                           // Distribución normal estándar
+               Mathf.Cos(2f * Mathf.PI * u2);                           // Distribuciï¿½n normal estï¿½ndar
     }
 }
