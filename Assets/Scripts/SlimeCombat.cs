@@ -4,64 +4,65 @@ using System.Collections;
 public class SlimeCombat : MonoBehaviour
 {
     public GameObject balaPrefab;
-    private Transform boss;
+    private Transform bossActual;
     private SlimeStats stats;
-    private bool activo = false;
+    private bool disparando = false;
+    public float rangoDeteccion = 7f; // Rango mediano para que tengas que acercarlo
 
     void Awake() => stats = GetComponent<SlimeStats>();
 
     public void ActivarAtaque(Transform target)
     {
-        boss = target;
-        if (stats == null) stats = GetComponent<SlimeStats>();
-        activo = true;
-        StartCoroutine(RutinaDisparo());
+        bossActual = target;
+        if (!disparando) StartCoroutine(BucleCombate());
     }
 
-    IEnumerator RutinaDisparo()
+    IEnumerator BucleCombate()
     {
-        while (activo && boss != null)
+        disparando = true;
+        while (bossActual != null)
         {
-            int cantidadBalas = 0;
-            float tiempoEspera = 0;
+            float distancia = Vector2.Distance(transform.position, bossActual.position);
 
-            // Configuramos según tus reglas
-            switch (stats.tipoSeleccionado)
+            // Solo dispara si el boss está en rango
+            if (distancia <= rangoDeteccion)
             {
-                case TipoSlime.Normal: cantidadBalas = 2; tiempoEspera = 3f; break;
-                case TipoSlime.Rapido:  cantidadBalas = 3; tiempoEspera = 2f; break;
-                case TipoSlime.Pesado:  cantidadBalas = 5; tiempoEspera = 3.5f; break;
-                case TipoSlime.Tanque:  cantidadBalas = 6; tiempoEspera = 3f; break;
-            }
+                int balas = 2; float cd = 3f;
+                switch (stats.tipoSeleccionado)
+                {
+                    case TipoSlime.Rapido: balas = 3; cd = 2f; break;
+                    case TipoSlime.Pesado: balas = 5; cd = 3.5f; break;
+                    case TipoSlime.Tanque: balas = 6; cd = 3f; break;
+                }
 
-            // Disparamos la ráfaga
-            for (int i = 0; i < cantidadBalas; i++)
+                for (int i = 0; i < balas; i++)
+                {
+                    if (bossActual == null) break;
+                    Disparar();
+                    yield return new WaitForSeconds(0.15f);
+                }
+                yield return new WaitForSeconds(cd);
+            }
+            else
             {
-                DispararConDispersion();
-                yield return new WaitForSeconds(0.1f); // Pequeño retraso entre balas de la misma ráfaga
+                yield return new WaitForSeconds(0.5f); // Esperar un poco antes de volver a chequear distancia
             }
-
-            yield return new WaitForSeconds(tiempoEspera);
         }
+        disparando = false;
     }
 
-    void DispararConDispersion()
+    void Disparar()
     {
-        if (balaPrefab == null || boss == null) return;
-
         GameObject b = Instantiate(balaPrefab, transform.position, Quaternion.identity);
+        Vector2 dir = (bossActual.position - transform.position).normalized;
+        float disp = Random.Range(-15f, 15f);
+        Vector2 dirFinal = Quaternion.Euler(0, 0, disp) * dir;
         
-        // Calculamos dirección básica
-        Vector2 dirBase = (boss.position - transform.position).normalized;
-
-        // AÑADIMOS DISPERSIÓN (Ángulo aleatorio entre -15 y 15 grados)
-        float anguloDispersion = Random.Range(-15f, 15f);
-        Vector2 dirFinal = Quaternion.Euler(0, 0, anguloDispersion) * dirBase;
-
-        float vel = (stats.tipoSeleccionado == TipoSlime.Rapido) ? 14f : 9f;
-        if (stats.tipoSeleccionado == TipoSlime.Tanque) b.transform.localScale *= 2f;
-
+        // Configurar la bala
+        BalaProyectil scriptBala = b.GetComponent<BalaProyectil>() ?? b.AddComponent<BalaProyectil>();
+        scriptBala.dano = 1f;
+        
         Rigidbody2D rb = b.GetComponent<Rigidbody2D>();
-        if (rb != null) rb.linearVelocity = dirFinal * vel;
+        if (rb != null) rb.linearVelocity = dirFinal * 12f;
     }
 }
