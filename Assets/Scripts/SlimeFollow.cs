@@ -7,12 +7,19 @@ public class SlimeFollow : MonoBehaviour
     public static List<GameObject> fila = new List<GameObject>();
 
     [Header("Estado")]
-    public bool siguiendo = false; // Esta es la variable que daba error
+    public bool siguiendo = false; 
     
     [Header("Ajustes")]
     public float velocidad = 6f;
     private Transform objetivo;
     private bool jugadorCerca = false;
+
+    void Awake()
+    {
+        // LIMPIEZA AL REINICIAR: Vaciamos la lista estática para que no de errores
+        if (fila == null) fila = new List<GameObject>();
+        fila.Clear();
+    }
 
     void Start()
     {
@@ -29,7 +36,15 @@ public class SlimeFollow : MonoBehaviour
         // RECLUTAR con la E
         if (jugadorCerca && Input.GetKeyDown(KeyCode.E) && !siguiendo)
         {
-            Reclutar();
+            // LÍMITE: fila[0] es el Player, por eso permitimos hasta 6 (Player + 5 Slimes)
+            if (fila.Count < 6) 
+            {
+                Reclutar();
+            }
+            else
+            {
+                Debug.Log("Ya tienes el máximo de 5 slimes siguiendo.");
+            }
         }
 
         // MOVIMIENTO
@@ -59,7 +74,7 @@ public class SlimeFollow : MonoBehaviour
             // Desactivar movimiento aleatorio si existe
             if (GetComponent<SlimeWanderFlee>() != null) GetComponent<SlimeWanderFlee>().enabled = false;
             
-            Debug.Log("Slime reclutado. Siguiendo a: " + objetivo.name);
+            Debug.Log("Slime reclutado. Siguiendo a: " + objetivo.name + ". Total en fila: " + (fila.Count - 1));
         }
     }
 
@@ -69,7 +84,6 @@ public class SlimeFollow : MonoBehaviour
         siguiendo = true;
     }
 
-    // Detección del jugador (Asegúrate de tener un CircleCollider2D como Trigger)
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player")) jugadorCerca = true;

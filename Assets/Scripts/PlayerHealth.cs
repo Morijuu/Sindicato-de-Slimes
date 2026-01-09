@@ -2,25 +2,29 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public int vida = 8;
+    public int vidaActual = 8; 
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    void Start()
     {
-        // Si el Boss toca al jugador
-        if (collision.gameObject.CompareTag("Boss"))
-        {
-            QuitarVida(1);
-        }
+        vidaActual = 8; 
+        if (GameManager.instance != null) GameManager.instance.ActualizarVidaJugador(vidaActual);
     }
 
     public void QuitarVida(int cantidad)
     {
-        vida -= cantidad;
-        Debug.Log("Vida Jugador: " + vida);
-        if (vida <= 0)
-        {
-            Debug.Log("Jugador muerto");
-            Destroy(gameObject);
+        vidaActual -= cantidad;
+        if (GameManager.instance != null) GameManager.instance.ActualizarVidaJugador(vidaActual);
+
+        if (vidaActual <= 0) {
+            GameManager.instance.FinalizarJuego(false);
+            gameObject.SetActive(false); 
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Boss")) {
+            QuitarVida(1);
         }
     }
 }

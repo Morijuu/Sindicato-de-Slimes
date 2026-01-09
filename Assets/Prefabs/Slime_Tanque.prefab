@@ -15,9 +15,10 @@ GameObject:
   - component: {fileID: 5859783557111987925}
   - component: {fileID: 1871054334043681500}
   - component: {fileID: -1937045227505583790}
+  - component: {fileID: 7808764126120079357}
   m_Layer: 0
   m_Name: Slime_Tanque
-  m_TagString: Untagged
+  m_TagString: Slime
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -140,10 +141,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195a7138a890fb9438e063fe7f14cdc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  followSpeed: 5
-  stopDistance: 1.5
-  trailingDistance: 1
-  isFollowing: 0
+  siguiendo: 0
+  velocidad: 6
 --- !u!114 &5859783557111987925
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,6 +158,7 @@ MonoBehaviour:
   spawnArea: {fileID: 0}
   fearCenter: {fileID: 0}
   fearRadius: 3
+  fearExitMultiplier: 1.4
   wanderSpeed: 1.5
   baseFleeSpeed: 3
   moveTimeMin: 0.6
@@ -167,6 +167,10 @@ MonoBehaviour:
   idleTimeMax: 1.2
   fearMultiplier: 1.5
   stdDev: 0.4
+  fleeMoveMin: 0.25
+  fleeMoveMax: 0.7
+  fleeStopMin: 0.1
+  fleeStopMax: 0.35
   spawnChance: 0
   maxChance: 0
 --- !u!114 &1871054334043681500
@@ -214,3 +218,17 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &7808764126120079357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6628858317522054840}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e81f4bc50a3cf8f48a6f5405a395ca88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  balaPrefab: {fileID: 6364590881843283346, guid: b08b9c9cb53c6ea4597b6105e7216db7, type: 3}
+  rangoDeteccion: 50

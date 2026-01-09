@@ -8,6 +8,8 @@ TagManager:
   - Bullet
   - Boss
   - Wall
+  - Room5
+  - Slime
   layers:
   - Default
   - TransparentFX
@@ -40,7 +42,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - bullets
   m_SortingLayers:
   - name: Default
     uniqueID: 0

@@ -4,65 +4,58 @@ using System.Collections;
 public class SlimeCombat : MonoBehaviour
 {
     public GameObject balaPrefab;
+    public float rangoDeteccion = 15f;
     private Transform bossActual;
-    private SlimeStats stats;
     private bool disparando = false;
-    public float rangoDeteccion = 7f; // Rango mediano para que tengas que acercarlo
 
-    void Awake() => stats = GetComponent<SlimeStats>();
+    public void ActivarAtaque(Transform target) => bossActual = target;
 
-    public void ActivarAtaque(Transform target)
+    void Update()
     {
-        bossActual = target;
-        if (!disparando) StartCoroutine(BucleCombate());
+        if (bossActual == null)
+        {
+            GameObject b = GameObject.FindWithTag("Boss");
+            if (b != null) bossActual = b.transform;
+        }
+        
+        if (bossActual != null && !disparando)
+        {
+            if (Vector2.Distance(transform.position, bossActual.position) <= rangoDeteccion)
+            {
+                StartCoroutine(BucleDisparo());
+            }
+        }
     }
 
-    IEnumerator BucleCombate()
+    IEnumerator BucleDisparo()
     {
         disparando = true;
         while (bossActual != null)
         {
-            float distancia = Vector2.Distance(transform.position, bossActual.position);
-
-            // Solo dispara si el boss está en rango
-            if (distancia <= rangoDeteccion)
+            if (Vector2.Distance(transform.position, bossActual.position) <= rangoDeteccion)
             {
-                int balas = 2; float cd = 3f;
-                switch (stats.tipoSeleccionado)
-                {
-                    case TipoSlime.Rapido: balas = 3; cd = 2f; break;
-                    case TipoSlime.Pesado: balas = 5; cd = 3.5f; break;
-                    case TipoSlime.Tanque: balas = 6; cd = 3f; break;
-                }
-
-                for (int i = 0; i < balas; i++)
-                {
-                    if (bossActual == null) break;
-                    Disparar();
-                    yield return new WaitForSeconds(0.15f);
-                }
-                yield return new WaitForSeconds(cd);
+                Disparar();
+                yield return new WaitForSeconds(1.2f);
             }
-            else
-            {
-                yield return new WaitForSeconds(0.5f); // Esperar un poco antes de volver a chequear distancia
-            }
+            else { break; }
         }
         disparando = false;
     }
 
     void Disparar()
     {
+        if (balaPrefab == null || bossActual == null) return;
+
         GameObject b = Instantiate(balaPrefab, transform.position, Quaternion.identity);
-        Vector2 dir = (bossActual.position - transform.position).normalized;
-        float disp = Random.Range(-15f, 15f);
-        Vector2 dirFinal = Quaternion.Euler(0, 0, disp) * dir;
-        
-        // Configurar la bala
-        BalaProyectil scriptBala = b.GetComponent<BalaProyectil>() ?? b.AddComponent<BalaProyectil>();
-        scriptBala.dano = 1f;
-        
-        Rigidbody2D rb = b.GetComponent<Rigidbody2D>();
-        if (rb != null) rb.linearVelocity = dirFinal * 12f;
+        Vector2 direccion = (bossActual.position - transform.position).normalized;
+
+        // IMPORTANTE: Para que detecte colisión sin Rigidbody, 
+        // al menos UNO de los dos debe ser cinemático o tener un RB básico.
+        // Vamos a asegurarnos de que la bala se mueva.
+        BalaMovimiento mov = b.GetComponent<BalaMovimiento>() ?? b.AddComponent<BalaMovimiento>();
+        mov.configurar(direccion, 14f); 
+
+        BalaProyectil bp = b.GetComponent<BalaProyectil>() ?? b.AddComponent<BalaProyectil>();
+        bp.dano = 5f; 
     }
 }

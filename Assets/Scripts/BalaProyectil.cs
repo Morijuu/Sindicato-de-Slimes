@@ -2,25 +2,25 @@ using UnityEngine;
 
 public class BalaProyectil : MonoBehaviour
 {
-    public float dano = 1f;
+    public float dano = 10f;
+    private bool haChocado = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Importante: El Boss debe tener el Tag "Boss"
+        if (haChocado) return;
+
         if (collision.CompareTag("Boss"))
         {
+            haChocado = true;
+            
             BossAI boss = collision.GetComponent<BossAI>();
             if (boss != null)
             {
+                // Llamamos a la función de daño y usamos "vida"
                 boss.RecibirDano(dano);
             }
-            Destroy(gameObject); // La bala desaparece al chocar
-        }
-        // Si choca con una pared (opcional)
-        else if (collision.CompareTag("Wall")) 
-        {
+
             Destroy(gameObject);
         }
     }
 }
-          
