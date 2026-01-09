@@ -3,6 +3,10 @@ using UnityEngine;
 public class RoomManager : MonoBehaviour
 {
     public static RoomManager instance;
+
+    [Header("Starting room (manual)")]
+    public Room startingRoom;
+
     private Room currentRoom;
 
     private void Awake()
@@ -13,53 +17,61 @@ public class RoomManager : MonoBehaviour
 
     private void Start()
     {
-        // 1. Buscamos todas las salas de la escena (incluso las desactivadas)
-        Room[] allRooms = Resources.FindObjectsOfTypeAll<Room>();
-        
-        Room firstRoom = null;
+        // Buscar todas las salas (incluye desactivadas)
+        Room[] rooms = FindObjectsByType<Room>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
-        foreach (Room r in allRooms)
+        if (rooms == null || rooms.Length == 0)
         {
-            // Solo actuamos sobre objetos que están realmente en la jerarquía (no en los assets)
-            if (r.gameObject.scene.name == null) continue; 
-
-            // 2. Si es la Room_1, la guardamos. Si es otra, la desactivamos.
-            if (r.gameObject.name == "Room_1" || r.gameObject.CompareTag("Room_1"))
-            {
-                firstRoom = r;
-                r.gameObject.SetActive(true); 
-            }
-            else
-            {
-                r.gameObject.SetActive(false);
-            }
+            Debug.LogError("RoomManager: No hay Rooms en la escena.");
+            return;
         }
 
-        // 3. Forzamos que el juego empiece en la Room_1
-        if (firstRoom != null)
+        // Si no asignas startingRoom, usa la primera encontrada
+        if (startingRoom == null)
         {
-            currentRoom = firstRoom;
-            
-            // Posicionamos la cámara inmediatamente (sin suavizado) al empezar
-            CameraFollowRoom cam = FindAnyObjectByType<CameraFollowRoom>();
-            if (cam != null && firstRoom.cameraPoint != null)
-            {
-                // Teletransporte inicial de la cámara para que no haya lag
-                Vector3 startPos = firstRoom.cameraPoint.position;
-                cam.transform.position = new Vector3(startPos.x, startPos.y, cam.transform.position.z);
-                cam.MoveToNewRoom(startPos);
-            }
+            startingRoom = rooms[0];
+            Debug.LogWarning("RoomManager: startingRoom no asignada. Usando la primera Room encontrada.");
+        }
+
+        // Apagar todas
+        foreach (Room r in rooms)
+            r.gameObject.SetActive(false);
+
+        // Encender solo la inicial
+        startingRoom.gameObject.SetActive(true);
+        currentRoom = startingRoom;
+
+        // Colocar cámara en la sala inicial
+        CameraFollowRoom cam = FindAnyObjectByType<CameraFollowRoom>();
+        if (cam != null && currentRoom.cameraPoint != null)
+        {
+            Vector3 p = currentRoom.cameraPoint.position;
+            cam.transform.position = new Vector3(p.x, p.y, cam.transform.position.z);
+            cam.MoveToNewRoom(p);
         }
     }
 
     public void ChangeRoom(Room newRoom)
     {
+
+        Debug.Log("ChangeRoom -> " + newRoom.name);
+        Debug.Log("cameraPoint -> " + (newRoom.cameraPoint == null ? "NULL" : newRoom.cameraPoint.name));
+
+        if (newRoom == null)
+        {
+            Debug.LogError("RoomManager.ChangeRoom: newRoom es NULL.");
+            return;
+        }
+
+        if (currentRoom == newRoom) return;
+
         if (currentRoom != null)
             currentRoom.gameObject.SetActive(false);
 
         currentRoom = newRoom;
         currentRoom.gameObject.SetActive(true);
 
+        // mover cámara al cameraPoint de la nueva sala
         CameraFollowRoom cam = FindAnyObjectByType<CameraFollowRoom>();
         if (cam != null && currentRoom.cameraPoint != null)
         {

@@ -1,71 +1,113 @@
 using UnityEngine;
-using System.Collections;
 
 public class BossManager : MonoBehaviour
 {
     public GameObject bossPrefab;
     public Transform spawnPoint;
-    public GameObject balaPrefab;
-    
+
+    private GameObject bossInstance;
     private bool bossYaSalio = false;
+
+    private int slimesPorSacrificar = 0;
+    private int slimesSacrificados = 0;
 
     void Update()
     {
-        // Detecta si pulsas la B y si no ha salido ya
+        // Spawn boss con B (solo una vez)
         if (Input.GetKeyDown(KeyCode.B) && !bossYaSalio)
         {
-            // Opcional: Verificar si el jugador está en la Room 5
-            // Si tu RoomManager es accesible, podrías poner: 
-            // if (RoomManager.instance.GetCurrentRoom().name == "Room_5")
-            
-            EmpezarCombate();
+            SpawnBoss();
+            LanzarSlimesAlBoss();
         }
     }
 
-    void EmpezarCombate()
+    void SpawnBoss()
     {
-        bossYaSalio = true;
-        Debug.Log("¡Tecla B pulsada! Spawneando Boss inmediatamente...");
-
         if (bossPrefab == null || spawnPoint == null)
         {
-            Debug.LogError("Faltan referencias en el BossManager (Prefab o SpawnPoint)");
+            Debug.LogError("BossManager: Asigna bossPrefab y spawnPoint.");
             return;
         }
 
-        // 1. Spawnea al Boss
-        GameObject bossObj = Instantiate(bossPrefab, spawnPoint.position, Quaternion.identity);
-        bossObj.tag = "Boss";
-
-        // 2. Activa su IA
-        BossAI ai = bossObj.GetComponent<BossAI>();
-        if (ai != null) ai.ActivarBoss();
-
-        // 3. Ordena a los Slimes que ataquen
-        ActivarAtaqueSlimes(bossObj.transform);
+        bossInstance = Instantiate(bossPrefab, spawnPoint.position, Quaternion.identity);
+        bossYaSalio = true;
+        Debug.Log("Boss apareció.");
     }
 
-    void ActivarAtaqueSlimes(Transform bossTransform)
+    void LanzarSlimesAlBoss()
     {
-        // Slimes sueltos en el escenario
-        SlimeCombat[] todos = Object.FindObjectsByType<SlimeCombat>(FindObjectsSortMode.None);
-        foreach (SlimeCombat s in todos)
+        if (bossInstance == null)
         {
-            s.ActivarAtaque(bossTransform);
+            Debug.LogError("BossManager: No existe bossInstance.");
+            return;
         }
 
-        // Slimes que todavía están en la fila (se sueltan y atacan)
+        // cantidad de slimes que te siguen (fila[0] es el Player)
+        slimesPorSacrificar = Mathf.Max(0, SlimeFollow.fila.Count - 1);
+        slimesSacrificados = 0;
+
+        if (slimesPorSacrificar == 0)
+        {
+            Debug.Log("No tienes slimes. Boss muere igualmente (según regla).");
+            MatarBoss();
+            return;
+        }
+
+        // De atrás hacia delante, soltar y lanzar
         for (int i = SlimeFollow.fila.Count - 1; i >= 1; i--)
         {
-            GameObject sObj = SlimeFollow.fila[i];
-            if (sObj != null)
-            {
-                sObj.GetComponent<SlimeFollow>().siguiendo = false;
-                SlimeCombat sc = sObj.GetComponent<SlimeCombat>() ?? sObj.AddComponent<SlimeCombat>();
-                sc.balaPrefab = balaPrefab;
-                sc.ActivarAtaque(bossTransform);
-                SlimeFollow.fila.RemoveAt(i);
-            }
+            GameObject slimeObj = SlimeFollow.fila[i];
+            if (slimeObj == null) continue;
+
+            // 1) quitar de la fila
+            SlimeFollow.fila.RemoveAt(i);
+
+            // 2) desactivar scripts que puedan interferir
+            SlimeFollow sf = slimeObj.GetComponent<SlimeFollow>();
+            if (sf != null) sf.enabled = false;
+
+            SlimeWanderFlee wf = slimeObj.GetComponent<SlimeWanderFlee>();
+            if (wf != null) wf.enabled = false;
+
+            SlimeFlee ff = slimeObj.GetComponent<SlimeFlee>();
+            if (ff != null) ff.enabled = false;
+
+            SlimeCombat sc = slimeObj.GetComponent<SlimeCombat>();
+            if (sc != null) sc.enabled = false;
+
+            // 3) añadir carga al boss
+            SlimeChargeToBoss charge = slimeObj.GetComponent<SlimeChargeToBoss>();
+            if (charge == null) charge = slimeObj.AddComponent<SlimeChargeToBoss>();
+
+            // velocidad opcional basada en tipo (si no hay stats, usa 8)
+            float speed = 8f; // todos cargan igual
+
+
+            charge.Init(bossInstance.transform, this, speed);
+
+        }
+
+        Debug.Log("Slimes lanzados al boss: " + slimesPorSacrificar);
+    }
+
+    public void OnSlimeSacrificed()
+    {
+        slimesSacrificados++;
+
+        // Cuando se hayan sacrificado todos, muere el boss
+        if (slimesSacrificados >= slimesPorSacrificar)
+        {
+            Debug.Log("Todos los slimes se han sacrificado. Boss muere.");
+            MatarBoss();
+        }
+    }
+
+    void MatarBoss()
+    {
+        if (bossInstance != null)
+        {
+            Destroy(bossInstance);
+            bossInstance = null;
         }
     }
 }
